@@ -2,6 +2,25 @@
 
 All notable changes to this plugin repository are documented in this file.
 
+## [0.0.8] - 2026-03-25
+
+### Changed
+- Replaced remaining builtin generic collection annotations with
+  `Tuple[...]`, `List[...]`, and `Dict[...]` across the local email plugin
+  repository.
+
+### Versioning
+- Bumped local plugin version to `0.0.8` in `plugins/email/plugin/__init__.py`.
+
+## [0.0.7] - 2026-03-25
+
+### Changed
+- Replaced the remaining `float | None` argument annotation with
+  `Optional[float]` in `plugins/email/plugin/runtime.py`.
+
+### Versioning
+- Bumped local plugin version to `0.0.7` in `plugins/email/plugin/__init__.py`.
+
 ## [0.0.6] - 2026-03-25
 
 ### Added

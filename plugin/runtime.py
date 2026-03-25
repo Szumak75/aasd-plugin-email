@@ -16,7 +16,7 @@ import ssl
 from email.message import EmailMessage
 from queue import Empty, Queue
 from threading import Event, Thread
-from typing import Any, List, Optional
+from typing import Any, Dict, List, Optional, Tuple
 
 from jsktoolbox.stringtool import SimpleCrypto
 from libs.com.message import Message, Multipart
@@ -209,11 +209,11 @@ class EmailRuntime(Thread, ThPluginMixin):
             self._state = state
         return state
 
-    def stop(self, timeout: float | None = None) -> None:
+    def stop(self, timeout: Optional[float] = None) -> None:
         """Request plugin shutdown.
 
         ### Arguments:
-        * timeout: float | None - Optional join timeout.
+        * timeout: Optional[float] - Optional join timeout.
         """
         stop_event: Optional[Event] = self._stop_event
         if stop_event is None:
@@ -270,7 +270,7 @@ class EmailRuntime(Thread, ThPluginMixin):
 
     def __build_email_message(
         self, context: PluginContext, message: Message
-    ) -> tuple[EmailMessage, list[str]]:
+    ) -> Tuple[EmailMessage, List[str]]:
         """Build an `EmailMessage` instance from the plugin message payload.
 
         ### Arguments:
@@ -278,7 +278,7 @@ class EmailRuntime(Thread, ThPluginMixin):
         * message: Message - Message container consumed by the plugin.
 
         ### Returns:
-        tuple[EmailMessage, list[str]] - Built email message and recipient list.
+        Tuple[EmailMessage, List[str]] - Built email message and recipient list.
         """
         email_message = EmailMessage()
         sender = str(message.sender or context.config[Keys.ADDRESS_FROM])
@@ -289,7 +289,7 @@ class EmailRuntime(Thread, ThPluginMixin):
             else f"[{context.app_meta.app_name}:{context.instance_name}] notification"
         )
         body = self.__build_body(message=message)
-        multipart: Optional[dict[str, Any]] = message.mmessages
+        multipart: Optional[Dict[str, Any]] = message.mmessages
 
         email_message["From"] = sender
         email_message["To"] = ", ".join(recipients)
@@ -309,7 +309,7 @@ class EmailRuntime(Thread, ThPluginMixin):
 
         return email_message, recipients
 
-    def __get_recipients(self, context: PluginContext, message: Message) -> list[str]:
+    def __get_recipients(self, context: PluginContext, message: Message) -> List[str]:
         """Return the final recipient list for the outbound email.
 
         ### Arguments:
@@ -317,12 +317,12 @@ class EmailRuntime(Thread, ThPluginMixin):
         * message: Message - Message container consumed by the plugin.
 
         ### Returns:
-        list[str] - Recipient email addresses.
+        List[str] - Recipient email addresses.
 
         ### Raises:
         * ValueError: If no recipients are configured for the message.
         """
-        recipients: list[str] = []
+        recipients: List[str] = []
         raw_recipients = message.to
 
         if isinstance(raw_recipients, str):
@@ -385,14 +385,14 @@ class EmailRuntime(Thread, ThPluginMixin):
             flush=True,
         )
 
-    def __smtp_endpoint(self, server: str) -> tuple[str, int]:
+    def __smtp_endpoint(self, server: str) -> Tuple[str, int]:
         """Parse the configured SMTP server definition.
 
         ### Arguments:
         * server: str - SMTP endpoint in `host` or `host:port` form.
 
         ### Returns:
-        tuple[str, int] - SMTP host and port pair.
+        Tuple[str, int] - SMTP host and port pair.
         """
         if ":" not in server:
             return server, 0
@@ -421,19 +421,19 @@ class EmailRuntime(Thread, ThPluginMixin):
             return raw_password
         return str(SimpleCrypto.multiple_decrypt(salt, raw_password))
 
-    def __smtp_ports(self, configured_port: int) -> list[int]:
+    def __smtp_ports(self, configured_port: int) -> List[int]:
         """Return the ordered list of SMTP ports to try for the next delivery.
 
         ### Arguments:
         * configured_port: int - Explicit SMTP port from configuration or `0`.
 
         ### Returns:
-        list[int] - Ordered SMTP ports for connection attempts.
+        List[int] - Ordered SMTP ports for connection attempts.
         """
         if configured_port > 0:
             return [configured_port]
 
-        ports: list[int] = []
+        ports: List[int] = []
         remembered_port = type(self)._REMEMBERED_PORT
         if remembered_port is not None:
             ports.append(remembered_port)
@@ -449,7 +449,7 @@ class EmailRuntime(Thread, ThPluginMixin):
         smtp_user: str,
         smtp_pass: str,
         email_message: EmailMessage,
-        recipients: list[str],
+        recipients: List[str],
     ) -> None:
         """Send one email using a single SMTP backend configuration.
 
@@ -459,7 +459,7 @@ class EmailRuntime(Thread, ThPluginMixin):
         * smtp_user: str - SMTP username.
         * smtp_pass: str - Decoded SMTP password.
         * email_message: EmailMessage - Prepared email message.
-        * recipients: list[str] - Recipient list.
+        * recipients: List[str] - Recipient list.
         """
         if port == 465:
             with smtplib.SMTP_SSL(

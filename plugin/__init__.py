@@ -1,4 +1,7 @@
 """SMTP email communication plugin package."""
 
-__version_info__: tuple[int, int, int] = (0, 0, 6)
+from typing import Tuple
+
+
+__version_info__: Tuple[int, int, int] = (0, 0, 8)
 __version__: str = ".".join(map(str, __version_info__))

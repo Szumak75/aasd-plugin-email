@@ -10,6 +10,7 @@ import unittest
 
 from queue import Queue
 from threading import Event
+from typing import Dict, List, Tuple
 from unittest.mock import MagicMock, patch
 
 from jsktoolbox.configtool import Config as ConfigTool
@@ -34,10 +35,10 @@ from plugins.email.plugin.runtime import EmailRuntime
 class _FakeSmtpBase:
     """Base fake SMTP client used by email runtime tests."""
 
-    instances: list["_FakeSmtpBase"] = []
-    sent_messages: list[dict[str, object]] = []
-    starttls_ports: list[int] = []
-    login_calls: list[tuple[str, str, int]] = []
+    instances: List["_FakeSmtpBase"] = []
+    sent_messages: List[Dict[str, object]] = []
+    starttls_ports: List[int] = []
+    login_calls: List[Tuple[str, str, int]] = []
 
     def __init__(self, host: str, port: int, timeout: int, **kwargs) -> None:
         self.host = host
@@ -87,7 +88,7 @@ class _FakeSmtpBase:
 class _FakeSMTP(_FakeSmtpBase):
     """Fake SMTP client used for plain or STARTTLS connections."""
 
-    failure_ports: dict[int, Exception] = {}
+    failure_ports: Dict[int, Exception] = {}
 
     def __init__(self, host: str, port: int, timeout: int, **kwargs) -> None:
         failure = type(self).failure_ports.get(port)
@@ -109,7 +110,7 @@ class _FakeSMTP(_FakeSmtpBase):
 class _FakeSMTPSSL(_FakeSmtpBase):
     """Fake SMTP SSL client used for implicit TLS connections."""
 
-    failure_ports: dict[int, Exception] = {}
+    failure_ports: Dict[int, Exception] = {}
 
     def __init__(self, host: str, port: int, timeout: int, **kwargs) -> None:
         failure = type(self).failure_ports.get(port)
@@ -127,11 +128,11 @@ class _FakeSMTPSSL(_FakeSmtpBase):
 class _ControlledEvent(Event):
     """Event with deterministic `is_set()` answers for runtime loop tests."""
 
-    def __init__(self, states: list[bool]) -> None:
+    def __init__(self, states: List[bool]) -> None:
         """Initialize the controlled event state sequence.
 
         ### Arguments:
-        * states: list[bool] - Sequential values returned by `is_set()`.
+        * states: List[bool] - Sequential values returned by `is_set()`.
         """
         super().__init__()
         self._states = list(states)
