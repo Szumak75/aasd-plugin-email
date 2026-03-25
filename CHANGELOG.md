@@ -2,6 +2,15 @@
 
 All notable changes to this plugin repository are documented in this file.
 
+## [0.0.6] - 2026-03-25
+
+### Added
+- Added plugin-local unit tests in `plugins/email/tests/test_email_plugin.py`.
+- Documented the standalone plugin test scope in `plugins/email/README.md`.
+
+### Versioning
+- Bumped local plugin version to `0.0.6` in `plugins/email/plugin/__init__.py`.
+
 ## [0.0.5] - 2026-03-25
 
 ### Added

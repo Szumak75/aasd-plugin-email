@@ -410,7 +410,7 @@ class EmailRuntime(Thread, ThPluginMixin):
         """
         raw_password = str(context.config[Keys.SMTP_PASS])
         main_section = context.app_meta.app_name.lower()
-        salt = context.config_handler.get(main_section, "salt")
+        salt: int = context.config_handler.get(main_section, "salt")
         if salt is None:
             return raw_password
         if not isinstance(salt, int):

@@ -11,6 +11,7 @@ responsible for SMTP-based email notifications.
 - `plugin/runtime.py` - thread-based communication runtime implementation
 - `requirements.txt` - plugin-local runtime dependencies
 - `CHANGELOG.md` - local plugin change history
+- `tests/` - plugin-local unit tests
 
 ## Current Scope
 
@@ -52,6 +53,13 @@ connections during the process lifetime.
   multipart email payloads when present
 - `smtp_pass` is decoded with `SimpleCrypto.multiple_decrypt` using the daemon
   main-section `salt`
+
+## Tests
+
+Unit tests for the standalone plugin repository are stored in `plugins/email/tests`.
+They cover plugin manifest exports, local configuration keys, SMTP transport
+selection, port failover, remembered port reuse, password decoding, recipient
+fallbacks, and runtime error handling.
 
 ## Design Notes
 

@@ -1,4 +1,4 @@
 """SMTP email communication plugin package."""
 
-__version_info__: tuple[int, int, int] = (0, 0, 5)
+__version_info__: tuple[int, int, int] = (0, 0, 6)
 __version__: str = ".".join(map(str, __version_info__))
