@@ -16,6 +16,11 @@ class Keys(object, metaclass=ReadOnlyClass):
     """Define plugin-specific configuration keys for email delivery."""
 
     # #[CONSTANTS]####################################################################
+    ADDRESS_FROM: str = "address_from"
+    ADDRESS_TO: str = "address_to"
+    SMTP_PASS: str = "smtp_pass"
+    SMTP_SERVER: str = "smtp_server"
+    SMTP_USER: str = "smtp_user"
     STDOUT_PREFIX: str = "stdout_prefix"
 
 
