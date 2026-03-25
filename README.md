@@ -1,34 +1,28 @@
-# AASd Communication Plugin Template
+# AASd Email Communication Plugin
 
-This directory provides a recommended starting point for a new AASd
-communication plugin repository.
+This directory contains a standalone AASd communication plugin repository
+responsible for SMTP-based email notifications.
 
 ## Included Files
 
 - `load.py` - required daemon entry point exposing `get_plugin_spec()`
-- `plugin/__init__.py` - plugin package marker
+- `plugin/__init__.py` - plugin package marker and local plugin version
 - `plugin/config.py` - plugin-specific configuration keys
 - `plugin/runtime.py` - thread-based communication runtime implementation
-- `requirements.txt` - plugin-local runtime dependencies placeholder
+- `requirements.txt` - plugin-local runtime dependencies
+- `CHANGELOG.md` - local plugin change history
 
-## How To Use
+## Current Scope
 
-1. Copy this directory to a new repository, for example
-   `aasd-plugin-example-comms/`.
-2. Rename identifiers in:
-   - `plugin_id`
-   - `plugin_name`
-   - `Keys`
-   - config field names and descriptions
-3. Replace the placeholder runtime behavior in `plugin/runtime.py` with the
-   real message handling logic.
-4. Mount the plugin repository into AASd through `plugins_dir`, preferably by a
-   symbolic link.
-5. Install plugin dependencies into the same Python environment used by AASd.
+The plugin is currently a communication runtime scaffold prepared for an SMTP
+notification implementation. The runtime still exposes placeholder processing
+logic and diagnostic stdout output, but the repository naming, metadata, and
+module documentation now target the email plugin instead of the generic
+template.
 
 ## Design Notes
 
-The template follows the current recommended pattern:
+The plugin follows the current recommended communication plugin pattern:
 
 - `PluginSpec` and `PluginContext` from the public runtime API
 - `PluginKind.COMMUNICATION` with dispatcher consumer registration

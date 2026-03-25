@@ -1,11 +1,12 @@
 # -*- coding: UTF-8 -*-
 """
-Communication template plugin runtime.
+Email communication plugin runtime.
 
 Author:  Jacek 'Szumak' Kotlarski --<szumak@virthost.pl>
 Created: 2026-03-24
 
-Purpose: Provide a starter thread-based runtime for new communication plugins.
+Purpose: Provide the thread-based runtime used by the SMTP email
+communication plugin.
 """
 
 import time
@@ -28,12 +29,12 @@ from libs.plugins import (
 from .config import Keys
 
 
-class CommsTemplateRuntime(Thread, ThPluginMixin):
-    """Minimal communication runtime used as a template for new plugins."""
+class EmailRuntime(Thread, ThPluginMixin):
+    """Provide the runtime responsible for email notification delivery."""
 
     # #[CONSTRUCTOR]##################################################################
     def __init__(self, context: PluginContext) -> None:
-        """Initialize the communication template runtime.
+        """Initialize the email communication runtime.
 
         ### Arguments:
         * context: PluginContext - Plugin runtime context.
@@ -138,7 +139,7 @@ class CommsTemplateRuntime(Thread, ThPluginMixin):
                 self._health = PluginHealthSnapshot(
                     health=PluginHealth.HEALTHY,
                     last_ok_at=now,
-                    message="Message consumed successfully.",
+                    message="Message consumed successfully by the email runtime.",
                 )
                 queue.task_done()
             except Empty:

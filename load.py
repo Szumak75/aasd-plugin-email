@@ -1,11 +1,12 @@
 # -*- coding: UTF-8 -*-
 """
-Communication template plugin entry point.
+Email communication plugin entry point.
 
 Author:  Jacek 'Szumak' Kotlarski --<szumak@virthost.pl>
 Created: 2026-03-24
 
-Purpose: Provide a starter `load.py` for standalone AASd communication plugins.
+Purpose: Provide the plugin manifest for the SMTP-based email communication
+plugin.
 """
 
 from libs.plugins import PluginCommonKeys, PluginKind, PluginSpec
@@ -13,20 +14,20 @@ from libs.templates import PluginConfigField, PluginConfigSchema
 
 from .plugin import __version__
 from .plugin.config import Keys
-from .plugin.runtime import CommsTemplateRuntime
+from .plugin.runtime import EmailRuntime
 
 
 def get_plugin_spec() -> PluginSpec:
-    """Return the plugin spec for the communication template plugin.
+    """Return the plugin spec for the email communication plugin.
 
     ### Returns:
     PluginSpec - Plugin manifest.
     """
     schema = PluginConfigSchema(
-        title="Communication template plugin.",
+        title="Email communication plugin.",
         description=(
-            "Starter communication plugin template showing the recommended "
-            "AASd plugin layout."
+            "SMTP-based communication plugin used to send notification "
+            "messages by email."
         ),
         fields=[
             PluginConfigField(
@@ -39,21 +40,21 @@ def get_plugin_spec() -> PluginSpec:
             PluginConfigField(
                 name=Keys.STDOUT_PREFIX,
                 field_type=str,
-                default="[plugin-comms-template]",
+                default="[plugin-email]",
                 required=True,
-                description="Prefix added to stdout output.",
-                example="[plugin-comms-template]",
+                description="Prefix added to runtime stdout diagnostic output.",
+                example="[plugin-email]",
             ),
         ],
     )
     return PluginSpec(
         api_version=1,
         config_schema=schema,
-        plugin_id="template.communication",
+        plugin_id="email.communication",
         plugin_kind=PluginKind.COMMUNICATION,
-        plugin_name="plugin_comms_template",
-        runtime_factory=CommsTemplateRuntime,
-        description="Starter AASd communication plugin template.",
+        plugin_name="plugin_email",
+        runtime_factory=EmailRuntime,
+        description="SMTP-based AASd communication plugin for email notifications.",
         plugin_version=__version__,
     )
 
