@@ -1,4 +1,4 @@
-# AASd Email Communication Plugin
+# AASd v2 Email Communication Plugin
 
 This directory contains a standalone AASd communication plugin repository
 responsible for SMTP-based email notifications.
