@@ -2,6 +2,23 @@
 
 All notable changes to this plugin repository are documented in this file.
 
+## [0.0.9] - 2026-03-26
+
+### Added
+- Added optional `footer_template` plugin configuration in
+  `plugins/email/load.py` and `plugins/email/plugin/config.py`.
+- Added footer rendering based on the local system hostname in
+  `plugins/email/plugin/runtime.py`.
+- Added unit coverage for default, disabled, and custom footer templates in
+  `plugins/email/tests/test_email_plugin.py`.
+
+### Changed
+- Appended the configured plugin footer after `message.footer` in the final
+  plain-text email body.
+
+### Versioning
+- Bumped local plugin version to `0.0.9` in `plugins/email/plugin/__init__.py`.
+
 ## [0.0.8] - 2026-03-25
 
 ### Changed

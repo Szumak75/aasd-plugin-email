@@ -181,6 +181,7 @@ class TestEmailPlugin(unittest.TestCase):
                 PluginCommonKeys.CHANNEL: 1,
                 Keys.ADDRESS_FROM: "sender@example.com",
                 Keys.ADDRESS_TO: ["admin@example.com", "ops@example.com"],
+                Keys.FOOTER_TEMPLATE: "hostmaster at {hostname}",
                 Keys.SMTP_PASS: "encoded-secret",
                 Keys.SMTP_SERVER: smtp_server,
                 Keys.SMTP_USER: "mailer@example.com",
@@ -219,6 +220,7 @@ class TestEmailPlugin(unittest.TestCase):
                 Keys.SMTP_PASS,
                 Keys.ADDRESS_FROM,
                 Keys.ADDRESS_TO,
+                Keys.FOOTER_TEMPLATE,
             ],
         )
 
@@ -230,6 +232,7 @@ class TestEmailPlugin(unittest.TestCase):
         self.assertEqual(Keys.SMTP_PASS, "smtp_pass")
         self.assertEqual(Keys.ADDRESS_FROM, "address_from")
         self.assertEqual(Keys.ADDRESS_TO, "address_to")
+        self.assertEqual(Keys.FOOTER_TEMPLATE, "footer_template")
 
     @patch("plugins.email.plugin.runtime.smtplib.SMTP_SSL", new=_FakeSMTPSSL)
     @patch("plugins.email.plugin.runtime.smtplib.SMTP", new=_FakeSMTP)
@@ -351,6 +354,79 @@ class TestEmailPlugin(unittest.TestCase):
         self.assertEqual(runtime.health().health, PluginHealth.UNHEALTHY)
         self.assertEqual(runtime.state().state, PluginState.STOPPED)
         self.assertIn("Email delivery failed", str(runtime.health().message))
+
+    @patch("plugins.email.plugin.runtime.socket.gethostname")
+    @patch("plugins.email.plugin.runtime.smtplib.SMTP_SSL", new=_FakeSMTPSSL)
+    @patch("plugins.email.plugin.runtime.smtplib.SMTP", new=_FakeSMTP)
+    @patch("plugins.email.plugin.runtime.SimpleCrypto.multiple_decrypt")
+    def test_08_runtime_should_append_default_footer_template(
+        self,
+        decrypt_mock: MagicMock,
+        hostname_mock: MagicMock,
+    ) -> None:
+        """Append the configured default footer template to the email body."""
+        decrypt_mock.return_value = "decoded-secret"
+        hostname_mock.return_value = "mail-host"
+        context = self.__build_context("smtp.example.com:25")
+        runtime = EmailRuntime(context)
+        message = Message()
+        message.subject = "footer"
+        message.messages = ["hello"]
+
+        runtime._EmailRuntime__send_message(context=context, message=message)
+
+        self.assertIn("hello", str(_FakeSMTP.sent_messages[0]["body"]))
+        self.assertIn("hostmaster at mail-host", str(_FakeSMTP.sent_messages[0]["body"]))
+
+    @patch("plugins.email.plugin.runtime.socket.gethostname")
+    @patch("plugins.email.plugin.runtime.smtplib.SMTP_SSL", new=_FakeSMTPSSL)
+    @patch("plugins.email.plugin.runtime.smtplib.SMTP", new=_FakeSMTP)
+    @patch("plugins.email.plugin.runtime.SimpleCrypto.multiple_decrypt")
+    def test_09_runtime_should_skip_footer_when_template_is_empty(
+        self,
+        decrypt_mock: MagicMock,
+        hostname_mock: MagicMock,
+    ) -> None:
+        """Skip the plugin footer when the template is configured as empty."""
+        decrypt_mock.return_value = "decoded-secret"
+        hostname_mock.return_value = "mail-host"
+        context = self.__build_context("smtp.example.com:25")
+        context.config[Keys.FOOTER_TEMPLATE] = ""
+        runtime = EmailRuntime(context)
+        message = Message()
+        message.subject = "footer-disabled"
+        message.messages = ["hello"]
+
+        runtime._EmailRuntime__send_message(context=context, message=message)
+
+        self.assertIn("hello", str(_FakeSMTP.sent_messages[0]["body"]))
+        self.assertNotIn("hostmaster at mail-host", str(_FakeSMTP.sent_messages[0]["body"]))
+
+    @patch("plugins.email.plugin.runtime.socket.gethostname")
+    @patch("plugins.email.plugin.runtime.smtplib.SMTP_SSL", new=_FakeSMTPSSL)
+    @patch("plugins.email.plugin.runtime.smtplib.SMTP", new=_FakeSMTP)
+    @patch("plugins.email.plugin.runtime.SimpleCrypto.multiple_decrypt")
+    def test_10_runtime_should_render_custom_footer_template(
+        self,
+        decrypt_mock: MagicMock,
+        hostname_mock: MagicMock,
+    ) -> None:
+        """Render a custom footer template with the local hostname."""
+        decrypt_mock.return_value = "decoded-secret"
+        hostname_mock.return_value = "mx01"
+        context = self.__build_context("smtp.example.com:25")
+        context.config[Keys.FOOTER_TEMPLATE] = "ops via {hostname}"
+        runtime = EmailRuntime(context)
+        message = Message()
+        message.subject = "footer-custom"
+        message.messages = ["hello"]
+        message.footer = "custom footer"
+
+        runtime._EmailRuntime__send_message(context=context, message=message)
+
+        body = str(_FakeSMTP.sent_messages[0]["body"])
+        self.assertIn("custom footer", body)
+        self.assertIn("ops via mx01", body)
 
 
 # #[EOF]#######################################################################

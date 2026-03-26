@@ -34,6 +34,9 @@ The plugin currently exposes the following configuration fields:
   `SimpleCrypto.multiple_decrypt`
 - `address_from` - sender email address
 - `address_to` - recipient email address list
+- `footer_template` - optional footer template appended to the email body;
+  defaults to `hostmaster at {hostname}` and uses the local system hostname;
+  set it to an empty string to disable the plugin footer completely
 
 ## Runtime Behavior
 
@@ -48,7 +51,8 @@ connections during the process lifetime.
 - `message.sender` overrides `address_from`
 - `message.to` overrides `address_to`
 - `message.reply_to` is mapped to the `Reply-To` header
-- `message.messages` and `message.footer` are merged into the plain-text body
+- `message.messages`, `message.footer`, and the rendered `footer_template` are
+  merged into the plain-text body in that order
 - `message.mmessages["plain"]` and `message.mmessages["html"]` are used for
   multipart email payloads when present
 - `smtp_pass` is decoded with `SimpleCrypto.multiple_decrypt` using the daemon
@@ -59,7 +63,7 @@ connections during the process lifetime.
 Unit tests for the standalone plugin repository are stored in `plugins/email/tests`.
 They cover plugin manifest exports, local configuration keys, SMTP transport
 selection, port failover, remembered port reuse, password decoding, recipient
-fallbacks, and runtime error handling.
+fallbacks, runtime error handling, and configurable footer rendering.
 
 ## Design Notes
 
