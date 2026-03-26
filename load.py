@@ -86,6 +86,17 @@ def get_plugin_spec() -> PluginSpec:
                 description="Recipient email address list used for notifications.",
                 example=["admin@example.com", "ops@example.com"],
             ),
+            PluginConfigField(
+                name=Keys.FOOTER_TEMPLATE,
+                field_type=str,
+                default="hostmaster at {hostname}",
+                required=False,
+                description=(
+                    "Optional footer template appended to outbound emails. "
+                    "Use an empty string to disable it."
+                ),
+                example="hostmaster at {hostname}",
+            ),
         ],
     )
     return PluginSpec(

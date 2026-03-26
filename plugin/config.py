@@ -18,6 +18,7 @@ class Keys(object, metaclass=ReadOnlyClass):
     # #[CONSTANTS]####################################################################
     ADDRESS_FROM: str = "address_from"
     ADDRESS_TO: str = "address_to"
+    FOOTER_TEMPLATE: str = "footer_template"
     SMTP_PASS: str = "smtp_pass"
     SMTP_SERVER: str = "smtp_server"
     SMTP_USER: str = "smtp_user"

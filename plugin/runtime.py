@@ -12,6 +12,7 @@ communication plugin.
 import time
 import smtplib
 import ssl
+import socket
 
 from email.message import EmailMessage
 from queue import Empty, Queue
@@ -266,7 +267,24 @@ class EmailRuntime(Thread, ThPluginMixin):
         body_parts: List[str] = [str(item) for item in message.messages if str(item)]
         if message.footer:
             body_parts.append(str(message.footer))
+        plugin_footer = self.__plugin_footer()
+        if plugin_footer:
+            body_parts.append(plugin_footer)
         return "\n".join(body_parts).strip()
+
+    def __plugin_footer(self) -> Optional[str]:
+        """Build the configured plugin footer for outbound messages.
+
+        ### Returns:
+        Optional[str] - Rendered footer or `None` when disabled.
+        """
+        context: Optional[PluginContext] = self._context
+        if context is None:
+            return None
+        template = str(context.config.get(Keys.FOOTER_TEMPLATE, "")).strip()
+        if template == "":
+            return None
+        return template.format(hostname=socket.gethostname())
 
     def __build_email_message(
         self, context: PluginContext, message: Message
