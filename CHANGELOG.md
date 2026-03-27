@@ -2,6 +2,20 @@
 
 All notable changes to this plugin repository are documented in this file.
 
+## [0.0.10] - 2026-03-27
+
+### Added
+- Added `plugins/email/tests/conftest.py` to bootstrap host AASd imports for
+  standalone plugin tests.
+
+### Changed
+- Made the email plugin test bootstrap independent from a hard-coded `$HOME`
+  or clone location as long as the plugin-repository layout remains unchanged.
+- Documented the local test bootstrap in `plugins/email/README.md`.
+
+### Versioning
+- Bumped local plugin version to `0.0.10` in `plugins/email/plugin/__init__.py`.
+
 ## [0.0.9] - 2026-03-26
 
 ### Added

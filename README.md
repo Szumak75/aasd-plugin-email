@@ -64,6 +64,8 @@ Unit tests for the standalone plugin repository are stored in `plugins/email/tes
 They cover plugin manifest exports, local configuration keys, SMTP transport
 selection, port failover, remembered port reuse, password decoding, recipient
 fallbacks, runtime error handling, and configurable footer rendering.
+The local `tests/conftest.py` bootstrap resolves the host AASd repository for
+public API imports without hard-coding `$HOME` or the clone location.
 
 ## Design Notes
 
