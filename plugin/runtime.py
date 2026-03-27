@@ -17,7 +17,7 @@ import socket
 from email.message import EmailMessage
 from queue import Empty, Queue
 from threading import Event, Thread
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple, Union
 
 from jsktoolbox.stringtool import SimpleCrypto
 from libs.com.message import Message, Multipart
@@ -267,7 +267,7 @@ class EmailRuntime(Thread, ThPluginMixin):
         body_parts: List[str] = [str(item) for item in message.messages if str(item)]
         if message.footer:
             body_parts.append(str(message.footer))
-        plugin_footer = self.__plugin_footer()
+        plugin_footer: Optional[str] = self.__plugin_footer()
         if plugin_footer:
             body_parts.append(plugin_footer)
         return "\n".join(body_parts).strip()
@@ -281,7 +281,7 @@ class EmailRuntime(Thread, ThPluginMixin):
         context: Optional[PluginContext] = self._context
         if context is None:
             return None
-        template = str(context.config.get(Keys.FOOTER_TEMPLATE, "")).strip()
+        template: str = str(context.config.get(Keys.FOOTER_TEMPLATE, "")).strip()
         if template == "":
             return None
         return template.format(hostname=socket.gethostname())
@@ -300,13 +300,13 @@ class EmailRuntime(Thread, ThPluginMixin):
         """
         email_message = EmailMessage()
         sender = str(message.sender or context.config[Keys.ADDRESS_FROM])
-        recipients = self.__get_recipients(context=context, message=message)
-        subject = (
+        recipients: List[str] = self.__get_recipients(context=context, message=message)
+        subject: str = (
             str(message.subject)
             if message.subject
             else f"[{context.app_meta.app_name}:{context.instance_name}] notification"
         )
-        body = self.__build_body(message=message)
+        body: str = self.__build_body(message=message)
         multipart: Optional[Dict[str, Any]] = message.mmessages
 
         email_message["From"] = sender
@@ -341,15 +341,19 @@ class EmailRuntime(Thread, ThPluginMixin):
         * ValueError: If no recipients are configured for the message.
         """
         recipients: List[str] = []
-        raw_recipients = message.to
+        raw_recipients: Optional[Union[str, List[str]]] = message.to
 
         if isinstance(raw_recipients, str):
             recipients = [raw_recipients]
         elif isinstance(raw_recipients, list):
             recipients = [str(item) for item in raw_recipients if str(item)]
         else:
-            config_recipients = context.config[Keys.ADDRESS_TO]
-            if isinstance(config_recipients, list):
+            config_recipients: Optional[Union[str, List[str]]] = context.config[
+                Keys.ADDRESS_TO
+            ]
+            if isinstance(config_recipients, str):
+                recipients = [config_recipients]
+            elif isinstance(config_recipients, list):
                 recipients = [str(item) for item in config_recipients if str(item)]
 
         if not recipients:
@@ -371,9 +375,9 @@ class EmailRuntime(Thread, ThPluginMixin):
             str(context.config[Keys.SMTP_SERVER])
         )
         smtp_user = str(context.config[Keys.SMTP_USER])
-        smtp_pass = self.__smtp_password(context=context)
+        smtp_pass: str = self.__smtp_password(context=context)
         prefix = str(context.config[Keys.STDOUT_PREFIX])
-        ports = self.__smtp_ports(configured_port=configured_port)
+        ports: List[int] = self.__smtp_ports(configured_port=configured_port)
         last_error: Exception | None = None
 
         for port in ports:
@@ -452,7 +456,7 @@ class EmailRuntime(Thread, ThPluginMixin):
             return [configured_port]
 
         ports: List[int] = []
-        remembered_port = type(self)._REMEMBERED_PORT
+        remembered_port: Optional[int] = type(self)._REMEMBERED_PORT
         if remembered_port is not None:
             ports.append(remembered_port)
         for port in self._DEFAULT_PORTS:
